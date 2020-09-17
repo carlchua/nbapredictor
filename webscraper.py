@@ -11,8 +11,8 @@ import shutil
 # REGULAR SEASON
 def reg_szn_games(year_start, year_end):
     year_start = int(year_start)
-    year_end = int(year_end)
-    assert(year_start>=1946 and year_end<=2020)
+    year_end = int(year_end) + 1
+    assert(year_start>=1946 and year_end<=2021)
     months = ["october", "november", "december", "january", "february", "march"]
 
     # Make directory for files
