@@ -50,31 +50,39 @@ def reg_szn_games(year_start, year_end):
                 r = requests.get(game_url, headers = header, verify = False)
                 soup2 = BeautifulSoup(r.text, features="lxml")
                 tables = soup2.find_all("table")
-                team1_basic = tables[0]
-                team1_adv = tables[7]
-                team2_basic = tables[8]
-                team2_adv = tables[15]
+                if len(tables)==16:
+                    team1_basic = tables[0]
+                    team1_adv = tables[7]
+                    team2_basic = tables[8]
+                    team2_adv = tables[15]
+                else:
+                    overtimes = int((len(tables)-16)/2)
+                    team1_basic = tables[0]
+                    team1_adv = tables[7+overtimes]
+                    team2_basic = tables[8+overtimes]
+                    team2_adv = tables[15+(overtimes*2)]
 
-                t1_b_header = [th.getText() for th in team1_basic.findAll('tr', limit=3)[1].findAll('th')][1:]
+
+                basic_header= [th.getText() for th in team1_basic.findAll('tr', limit=3)[1].findAll('th')]
+                basic_header[0] = 'Players'
+                adv_header = [th.getText() for th in team1_adv.findAll('tr', limit=3)[1].findAll('th')]
+                adv_header[0] = 'Players'
+
                 r1b = team1_basic.findAll('tr')[2:]
-                stats_1b = [[td.getText() for td in r1b[i].findAll('td')] for i in range(len(r1b)) if i!=5]
-                df1b = pd.DataFrame(stats_1b, columns = t1_b_header)
+                stats_1b = [[td.getText() for td in r1b[i].findAll(['td', 'th'])] for i in range(len(r1b)) if i!=5]
+                df1b = pd.DataFrame(stats_1b, columns = basic_header)
 
-                t1_a_header = [th.getText() for th in team1_adv.findAll('tr', limit=3)[1].findAll('th')][1:]
                 r1a = team1_adv.findAll('tr')[2:]
-                stats_1a = [[td.getText() for td in r1a[i].findAll('td')] for i in range(len(r1a)) if i!=5]
-                df1a = pd.DataFrame(stats_1a, columns = t1_a_header)
+                stats_1a = [[td.getText() for td in r1a[i].findAll(['td', 'th'])] for i in range(len(r1a)) if i!=5]
+                df1a = pd.DataFrame(stats_1a, columns = adv_header)
 
-                t2_b_header = [th.getText() for th in team2_basic.findAll('tr', limit=3)[1].findAll('th')][1:]
                 r2b = team2_basic.findAll('tr')[2:]
-                stats_2b = [[td.getText() for td in r2b[i].findAll('td')] for i in range(len(r2b)) if i!=5]
-                df2b = pd.DataFrame(stats_2b, columns = t2_b_header)
+                stats_2b = [[td.getText() for td in r2b[i].findAll(['td', 'th'])] for i in range(len(r2b)) if i!=5]
+                df2b = pd.DataFrame(stats_2b, columns = basic_header)
 
-
-                t2_a_header = [th.getText() for th in team2_adv.findAll('tr', limit=3)[1].findAll('th')][1:]
                 r2a = team2_adv.findAll('tr')[2:]
-                stats_2a = [[td.getText() for td in r2a[i].findAll('td')] for i in range(len(r2a)) if i!=5]
-                df2a = pd.DataFrame(stats_2a, columns = t2_a_header)
+                stats_2a = [[td.getText() for td in r2a[i].findAll(['td', 'th'])] for i in range(len(r2a)) if i!=5]
+                df2a = pd.DataFrame(stats_2a, columns = adv_header)
 
                 mydivs = soup2.findAll("div", {"class": "scores"})
                 score_arr = []
@@ -94,12 +102,24 @@ def reg_szn_games(year_start, year_end):
                 f.write(buff)
                 f.close()
 
+                df1b.to_csv("team1basic.csv")
+                shutil.move("team1basic.csv", local)
+
+                df1a.to_csv("team1adv.csv")
+                shutil.move("team1adv.csv", local)
+
+                df2b.to_csv("team2basic.csv")
+                shutil.move("team2basic.csv", local)
+
+                df2a.to_csv("team2adv.csv")
+                shutil.move("team2adv.csv", local)
+
                 game_no += 1
+
 
 def season_stats(year):
     year = int(year)
     assert(year>=1946 and year<=2020)
-
     parent_dir = os.getcwd()
     season_stats = os.path.join(parent_dir, "season_stats_{}".format(year))
     os.mkdir(season_stats)
@@ -113,8 +133,6 @@ def season_stats(year):
     df = pd.DataFrame(player_stats, columns = headers)
     df.to_csv("stats.csv")
     shutil.move("stats.csv", season_stats)
-
-
 
 
 def main():
