@@ -69,7 +69,7 @@ The above code will return player data for the 2018 season.
 py webscraper.py train 2015 2019
 ```
 The above code returns the necessary data to train the neural network model. This encompasses monthly advanced team stats from the 2015-2019 regular seasons. The data is also cleaned and organized properly for the neural network.
-This command was used to generate the data currently in training_data.
+This command was used to generate the data currently in training_data (2018 data was moved to test_data).
 
 ### Neural Network
 
