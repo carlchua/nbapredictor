@@ -3,12 +3,77 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import pandas as pd
 import re
+from selenium import webdriver
 import requests
 import sys
 import os
 import shutil
+from selenium import webdriver
 
-# REGULAR SEASON
+team_dict = {
+    "Atlanta Hawks": "ATL", "Boston Celtics": "BOS", "Brooklyn Nets": "BRK",
+    "Chicago Bulls": "CHI", "Charlotte Hornets": "CHO", "Charlotte Bobcats": "CHA",
+    "Cleveland Cavaliers": "CLE", "Dallas Mavericks": "DAL", "Denver Nuggets": "DEN",
+    "Detroit Pistons": "DET", "Golden State Warriors": "GSW", "Houston Rockets": "HOU",
+    "Indiana Pacers": "IND", "Los Angeles Clippers": "LAC", "Los Angeles Lakers": "LAL",
+    "Vancouver Grizzlies": "VAN", "Memphis Grizzlies": "MEM", "Miami Heat": "MIA",
+    "Milwaukee Bucks": "MIL", "Minnesota Timberwolves": "MIN", "New Orleans Pelicans": "NOH",
+    "New Orleans/Oklahoma City Hornets": "NOK", "New Orleans Hornets": "NOH", "New York Knicks": "NYK",
+    "Seattle SuperSonics": "SEA", "Oklahoma City Thunder": "OKC", "Orlando Magic": "ORL",
+    "Philadelphia 76ers": "PHI", "Phoenix Suns": "PHO", "Portland Trail Blazers": "POR",
+    "Sacramento Kings": "SAC", "San Antonio Spurs": "SAS", "Toronto Raptors": "TOR",
+    "Utah Jazz": "UTA", "Washington Wizards": "WAS", "Washington Bullets": "WSB"
+            }
+
+
+def train(year_start, year_end):
+        year_start = int(year_start)
+        year_end = int(year_end) + 1
+        assert(year_start>=2000 and year_end<=2020)
+        months = {"october": 1, "november": 2, "december": 3, "january": 4, "february": 5, "march": 6}
+        parent_dir = os.getcwd()
+        new_path = os.path.join(parent_dir, "training_data")
+        os.chdir(new_path)
+
+        for year in range(year_start,year_end):
+            for m in months:
+                game_no = 0
+                year_str = str(year-1) + '-' + str(year)[2:]
+                # CHROMEDRIVER PATH HERE IF NEEDED
+                d = webdriver.Chrome(executable_path=parent_dir+'\chromedriver.exe')
+                url = 'https://stats.nba.com/teams/advanced/?sort=W&dir=-1&Season={}&SeasonType=Regular%20Season&Month={}'.format(year_str, months[m])
+                d.get(url)
+                s = BeautifulSoup(d.page_source, 'html.parser').find('table')
+                headers, [_, *data] = [i.getText().strip() for i in s.find_all('th')], [[i.getText().strip() for i in b.find_all('td')] for b in s.find_all('tr')]
+                final_data = [i for i in data if len(i) > 1]
+                df1 = pd.DataFrame(final_data, columns = headers[:20])
+                del df1['']
+                df1.loc[(df1['TEAM']=='LA Clippers'), 'TEAM']= 'Los Angeles Clippers'       #After 2016, The Los Angeles Clippers were rebranded the 'LA Clippers', but this doesn't show on basketball reference
+
+                url = "https://www.basketball-reference.com/leagues/NBA_{}_games-{}.html".format(year,m)
+                html = urlopen(url)
+                soup = BeautifulSoup(html, features="lxml")
+                table = soup.find('table')
+                header = [th.getText() for th in table.findAll('tr', limit=2)[0].findAll('th')]
+                header[2:6] = ['team1', 'team1pts', 'team2', 'team2pts']
+                basic_data = table.findAll('tr')[2:]
+                g_data = [[td.getText() for td in basic_data[i].findAll(['td','th'])] for i in range(len(basic_data))]
+                games = pd.DataFrame(g_data, columns = header)
+                games = games.drop(['Date', '\xa0', '\xa0', 'Attend.', 'Notes', 'Start (ET)'], axis=1)
+
+                games["team1pts"] = games["team1pts"].astype(str).astype(int)
+                games["team2pts"] = games["team2pts"].astype(str).astype(int)
+
+
+                games = games.merge(df1.add_prefix('1'), how='left', right_on = ['1TEAM'], left_on = ['team1']).drop(['1TEAM'], axis=1)
+                games = games.merge(df1.add_prefix('2'), how='left', right_on = ['2TEAM'], left_on = ['team2']).drop(['2TEAM'], axis=1)
+
+                games['net'] = games['team1pts'] - games['team2pts']
+
+                filename = '{}{}.csv'.format(year, months[m])
+                games.to_csv(filename)
+
+
 def reg_szn_games(year_start, year_end):
     year_start = int(year_start)
     year_end = int(year_end) + 1
@@ -18,13 +83,16 @@ def reg_szn_games(year_start, year_end):
     # Make directory for files
     parent_dir = os.getcwd()
     reg_szn_games_path = os.path.join(parent_dir, "regular_season_games")
-    os.mkdir(reg_szn_games_path)
+    os.chdir(reg_szn_games_path)
 
     for year in range(year_start,year_end):
 
         # All games in current year
         year_path = os.path.join(reg_szn_games_path, str(year))
-        os.mkdir(year_path)
+        if not os.path.exists(year_path):
+            os.mkdir(year_path)
+        else:
+            continue
 
         for m in months:
             game_no = 0
@@ -87,20 +155,18 @@ def reg_szn_games(year_start, year_end):
                 mydivs = soup2.findAll("div", {"class": "scores"})
                 score_arr = []
                 for d in mydivs:
-                    score_arr.append(d.get_text())
+                    score_arr.append(int(d.get_text()))
 
-                score1= re.sub("[^0-9]", "", score_arr[0])
-                score2 = re.sub("[^0-9]", "", score_arr[1])
-
-                winner = max([(score1, 1), (score2, 2)])[1]
+                teamnames = soup2.find_all("a", {"itemprop": "name"})
+                headers = [n.getText() for n in teamnames]
+                outcome = pd.DataFrame([score_arr], columns = headers)
 
                 new_dir = m + str(game_no)
                 local = os.path.join(year_path, new_dir)
                 os.mkdir(local)
-                f = open(os.path.join(local, "winner.txt"), "w+")
-                buff = str(winner) + "\n" + score1 + "\n" + score2
-                f.write(buff)
-                f.close()
+
+                outcome.to_csv("outcome.csv")
+                shutil.move("outcome.csv", local)
 
                 df1b.to_csv("team1basic.csv")
                 shutil.move("team1basic.csv", local)
@@ -144,6 +210,11 @@ def main():
     if sys.argv[1] == "szn":
         year = sys.argv[2]
         season_stats(year)
+
+    if sys.argv[1] == "train":
+        year_start = sys.argv[2]
+        year_end = sys.argv[3]
+        train(year_start, year_end)
 
 if __name__ == "__main__":
     main()
