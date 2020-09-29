@@ -79,11 +79,11 @@ The Neural Network code is available in both Jupyter Notebook (.ipynb) format, a
 ## Neural Network Performance
 
 <p align="center">
-    <img src="images/data1.png" alt="Logo" width="376" height="179">
+    <img src="images/data1.png" alt="Logo" width="514" height="358">
+</p>
 
-
-    <img src="images/data2.png" alt="Logo" width="257" height="139">
-
+<p align="center">
+    <img src="images/data2.png" alt="Logo" width="514" height="278">
 </p>
 
 <!-- CONTACT -->
