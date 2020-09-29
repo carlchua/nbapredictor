@@ -1,8 +1,9 @@
 <br />
 <p align="center">
-  <a href="https://github.com/github_username/repo_name">
+  <a href="https://nba.com">
     <img src="images/bball.png" alt="Logo" width="750" height="333">
   </a>
+
 
   <h3 align="center">NBA Predictor & Webscraper</h3>
 </p>
@@ -15,6 +16,7 @@
 * [About the Project](#about-the-project)
 * [Getting Started](#getting-started)
 * [Usage](#usage)
+* [Neural Network Performance](#Neural-Network-Performance)
 * [Contact](#contact)
 * [Acknowledgements](#acknowledgements)
 
@@ -69,9 +71,20 @@ py webscraper.py train 2015 2019
 The above code returns the necessary data to train the neural network model. This encompasses monthly advanced team stats from the 2015-2019 regular seasons. The data is also cleaned and organized properly for the neural network.
 This command was used to generate the data currently in training_data.
 
-###Neural Network
+### Neural Network
 
 The Neural Network code is available in both Jupyter Notebook (.ipynb) format, and regular Python file (.py) format. 
+
+<!-- Neural Network Performance -->
+## Neural Network Performance
+
+<p align="center">
+    <img src="images/data1.png" alt="Logo" width="376" height="179">
+
+
+    <img src="images/data2.png" alt="Logo" width="257" height="139">
+
+</p>
 
 <!-- CONTACT -->
 ## Contact
