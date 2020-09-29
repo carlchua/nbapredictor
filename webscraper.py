@@ -64,7 +64,6 @@ def train(year_start, year_end):
                 games["team1pts"] = games["team1pts"].astype(str).astype(int)
                 games["team2pts"] = games["team2pts"].astype(str).astype(int)
 
-
                 games = games.merge(df1.add_prefix('1'), how='left', right_on = ['1TEAM'], left_on = ['team1']).drop(['1TEAM'], axis=1)
                 games = games.merge(df1.add_prefix('2'), how='left', right_on = ['2TEAM'], left_on = ['team2']).drop(['2TEAM'], axis=1)
 
