@@ -91,7 +91,7 @@ The Neural Network code is available in both Jupyter Notebook (.ipynb) format, a
     <img src="images/data3.png" alt="Logo" width="514" height="358">
 </p>
 
-The model was 0.7297535211267606% accurate (based on the testing data).
+The model was 0.72% accurate (based on the testing data).
 <!-- CONTACT -->
 ## Contact
 
