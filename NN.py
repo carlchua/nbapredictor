@@ -22,8 +22,8 @@ training_files = glob.glob(training_path + "/*.csv")
 data = []
 for file in training_files:
     df = pd.read_csv(file, usecols = [i for i in range(1, 42)])
-    df = df.drop(['team1','team2','1MIN', '2MIN'], axis=1)
-    data.append(df);
+    df = df.drop(['team1', 'team1pts','team2', 'team2pts','1MIN', '2MIN'], axis=1)
+    data.append(df)
 
 training_data = pd.concat(data, axis=0, ignore_index=True)
 
@@ -34,7 +34,7 @@ test_files = glob.glob(test_path + "/*.csv")
 data = []
 for file in test_files:
     df = pd.read_csv(file, usecols = [i for i in range(1, 42)])
-    df = df.drop(['team1','team2','1MIN', '2MIN'], axis=1)
+    df = df.drop(['team1', 'team1pts','team2', 'team2pts','1MIN', '2MIN'], axis=1)
     data.append(df)
 
 test_data = pd.concat(data, axis=0, ignore_index=True)
