@@ -35,7 +35,8 @@ may include significant outliers (from 20pt+ blowouts etc). MAE is more robust t
 
 
 ***TODO:***
-* Create other predictors - PCA regression?
+* Fix Predictor for user inputs - NBA website changed, current implementation does not work.
+* Create predictor or agent (reinforcement learning) for fantasy basketball.
 
 <!-- GETTING STARTED -->
 ## Getting Started
