@@ -81,18 +81,27 @@ The Neural Network code is available in both Jupyter Notebook (.ipynb) format, a
 ## Neural Network Performance
 
 <p align="center">
-    <img src="images/data1.png" alt="Logo" width="514" height="358">
+    <img src="images/nn_epochs.png" alt="Logo" width="514" height="358">
 </p>
 
 <p align="center">
-    <img src="images/data2.png" alt="Logo" width="514" height="278">
+    <img src="images/nn_scores.png" alt="Logo" width="514" height="278">
 </p>
 
 <p align="center">
-    <img src="images/data3.png" alt="Logo" width="514" height="358">
+    <img src="images/nn_acc.png" alt="Logo" width="514" height="358">
 </p>
 
-The model was 0.72% accurate (based on the testing data).
+The Neural Network model predicted the victory outcome correctly 72% of the time on test data.
+
+### Logistic Regression
+<p align="center">
+    <img src="images/logreg_acc" alt="Logo" width="514" height="358">
+</p>
+
+The Logistic Regression classifier predicted the victory outcome correctly 72.3% of the time on test data.
+
+
 <!-- CONTACT -->
 ## Contact
 
