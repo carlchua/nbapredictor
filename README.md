@@ -96,7 +96,7 @@ The Neural Network model predicted the victory outcome correctly 72% of the time
 
 ### Logistic Regression
 <p align="center">
-    <img src="images/logreg_acc" alt="Logo" width="514" height="358">
+    <img src="images/logreg_acc.png" alt="Logo" width="514" height="358">
 </p>
 
 The Logistic Regression classifier predicted the victory outcome correctly 72.3% of the time on test data.
